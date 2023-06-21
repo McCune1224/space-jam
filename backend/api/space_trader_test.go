@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -14,10 +15,6 @@ var (
 )
 
 func spaceTraderClientSetup() {
-	// err := godotenv.auto(".test.env")
-	// if err != nil {
-	// 	panic(err)
-	// }
 	testUsername = os.Getenv("ST_USERNAME")
 	testToken = os.Getenv("ST_TOKEN")
 	if testUsername == "" || testToken == "" {
@@ -37,10 +34,11 @@ func TestGetStatus(t *testing.T) {
 	}
 }
 
-// func TestGetUser(t *testing.T) {
-// 	resp, err := testTrader.GetUser()
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-// 	fmt.Println(resp)
-// }
+func TestGetAgent(t *testing.T) {
+	spaceTraderClientSetup()
+	agentResponse, err := testTrader.GetAgent()
+	if err != nil {
+		t.Error(err)
+	}
+    fmt.Println(agentResponse)
+}
