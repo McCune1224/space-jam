@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -31,12 +30,11 @@ func spaceTraderClientTeardown() {
 }
 
 func TestGetStatus(t *testing.T) {
-    spaceTraderClientSetup()
-	resp, err := testTrader.GetStatus()
+	spaceTraderClientSetup()
+	_, err := testTrader.GetStatus()
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(resp)
 }
 
 // func TestGetUser(t *testing.T) {

@@ -17,6 +17,7 @@ func TestGet(t *testing.T) {
 	crudClientSetup()
 	testCases := []struct {
 		url         string
+		headers     map[string]string
 		queryParams map[string]string
 		bodyDump    interface{}
 	}{
@@ -25,17 +26,20 @@ func TestGet(t *testing.T) {
 			"https://api.chucknorris.io/jokes/random",
 			nil,
 			nil,
+			nil,
 		},
 		// Endpoint with url and query params
 		{
 			"https://api.chucknorris.io/search",
+			nil,
 			map[string]string{"query": "dev"},
 			nil,
 		},
-		// Endpoint with url, query params, and body dump
+		// Status Endpoint for SpaceTraders
 		{
-			"https://api.spacetraders.io/game/status",
-			map[string]string{"token": "test"},
+			BASE_URL,
+			map[string]string{"Authorization": fmt.Sprintf("Bearer %s", testToken)},
+			nil,
 			&struct {
 				Status  string `json:"status"`
 				Message string `json:"message"`
@@ -44,14 +48,14 @@ func TestGet(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		if testCase.bodyDump != nil {
-			err := testCrudClient.Get(testCase.url, testCase.queryParams, testCase.bodyDump)
-			fmt.Println("Body Dump: ", testCase.bodyDump)
+			err := testCrudClient.Get(testCase.url, testCase.headers, testCase.queryParams, testCase.bodyDump)
+            fmt.Println(testCase.bodyDump)
 			if err != nil {
 				t.Errorf("Error getting %s: %v", testCase.url, err)
 			}
 			continue
 		}
-		err := testCrudClient.Get(testCase.url, testCase.queryParams)
+		err := testCrudClient.Get(testCase.url, nil, testCase.queryParams)
 		if err != nil {
 			t.Errorf("Error getting %s: %v", testCase.url, err)
 		}

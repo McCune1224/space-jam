@@ -11,14 +11,13 @@ import (
 
 // Key routes for the SpaceTraders API.
 const (
-	BASE_URL = "https://api.spacetraders.io"
+	BASE_URL = "https://api.spacetraders.io/v2"
 
 	USERS_URL = BASE_URL + "/users"
 
 	GAME_URL           = BASE_URL + "/game"
 	GAME_SHIPS_URL     = GAME_URL + "/ships"
 	GAME_LOANS_URL     = GAME_URL + "/loans"
-	GAME_STATUS_URL    = GAME_URL + "/status"
 	GAME_SYSTEMS_URL   = GAME_URL + "/systems"
 	GAME_LOCATIONS_URL = GAME_URL + "/locations"
 )
@@ -29,6 +28,19 @@ type SpaceTradersClient struct {
 	token      string
 	username   string
 	httpClient *crudClient
+	authHeader map[string]string
+}
+
+// Create a new SpaceTradersClient.
+func NewSpaceTraderClient(token string, username string) *SpaceTradersClient {
+	return &SpaceTradersClient{
+		token:      token,
+		username:   username,
+		httpClient: newCrudClient(),
+		authHeader: map[string]string{
+			"Authorization": "Bearer " + token,
+		},
+	}
 }
 
 func RegisterNewAgent(email string, faction string, symbol string) error {
@@ -54,18 +66,9 @@ func RegisterNewAgent(email string, faction string, symbol string) error {
 	return nil
 }
 
-// Create a new SpaceTradersClient.
-func NewSpaceTraderClient(token string, username string) *SpaceTradersClient {
-	return &SpaceTradersClient{
-		token:      token,
-		username:   username,
-		httpClient: newCrudClient(),
-	}
-}
-
-func (st *SpaceTradersClient) GetStatus() (*types.Status, error) {
+func (stc *SpaceTradersClient) GetStatus() (*types.Status, error) {
 	statusResponse := types.Status{}
-	err := st.httpClient.Get(GAME_STATUS_URL, nil, statusResponse)
+	err := stc.httpClient.Get(BASE_URL, nil, nil, &statusResponse)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ func newCrudClient() *crudClient {
 
 // Get a resource from the SpaceTraders API. If no response type is provided,
 // the response will be printed to std out as a string.
-func (ac *crudClient) Get(url string, queryParams map[string]string, responseBody ...interface{}) error {
+func (cc *crudClient) Get(url string, headers map[string]string, queryParams map[string]string, responseBody ...interface{}) error {
 	requestURL := url
 	if queryParams != nil {
 		requestURL += "?"
@@ -38,10 +38,17 @@ func (ac *crudClient) Get(url string, queryParams map[string]string, responseBod
 	if err != nil {
 		return err
 	}
+
+	// Headers to add
+	// Web API so these are just defaults
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
+	// Add any additional headers (e.g. Authiriization)
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
 
-	resp, err := ac.client.Do(req)
+	resp, err := cc.client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -70,7 +77,7 @@ func (ac *crudClient) Get(url string, queryParams map[string]string, responseBod
 	return nil
 }
 
-func (ac *crudClient) Post() {
+func (cc *crudClient) Post() {
 }
-func (ac *crudClient) Put()    {}
-func (ac *crudClient) Delete() {}
+func (cc *crudClient) Put()    {}
+func (cc *crudClient) Delete() {}
