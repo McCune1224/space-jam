@@ -1,54 +1,70 @@
 package api
 
 import (
-	"os"
+	"fmt"
 	"testing"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
-var (
-	username = ""
-	token    = ""
-	trader   *SpaceTradersClient
-)
+var testCrudClient *crudClient
 
-func setup() {
-	// err := godotenv.auto(".test.env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	username = os.Getenv("ST_USERNAME")
-	token = os.Getenv("ST_TOKEN")
-	if username == "" || token == "" {
-		panic("failed to load env variables")
+func crudClientSetup() {
+	testCrudClient = newCrudClient()
+}
+
+func crudClientTeardown() {}
+
+func TestGet(t *testing.T) {
+	crudClientSetup()
+	testCases := []struct {
+		url         string
+		queryParams map[string]string
+		bodyDump    interface{}
+	}{
+		// Endpoint with only url
+		{
+			"https://api.chucknorris.io/jokes/random",
+			nil,
+			nil,
+		},
+		// Endpoint with url and query params
+		{
+			"https://api.chucknorris.io/search",
+			map[string]string{"query": "dev"},
+			nil,
+		},
+		// Endpoint with url, query params, and body dump
+		{
+			"https://api.spacetraders.io/game/status",
+			map[string]string{"token": "test"},
+			&struct {
+				Status  string `json:"status"`
+				Message string `json:"message"`
+			}{},
+		},
+	}
+	for _, testCase := range testCases {
+		if testCase.bodyDump != nil {
+			err := testCrudClient.Get(testCase.url, testCase.queryParams, testCase.bodyDump)
+			fmt.Println("Body Dump: ", testCase.bodyDump)
+			if err != nil {
+				t.Errorf("Error getting %s: %v", testCase.url, err)
+			}
+			continue
+		}
+		err := testCrudClient.Get(testCase.url, testCase.queryParams)
+		if err != nil {
+			t.Errorf("Error getting %s: %v", testCase.url, err)
+		}
 	}
 }
 
-func teardown() {
+func TestPost(t *testing.T) {
 }
 
-func TestMain(m *testing.M) {
-	setup()
-	trader = New(token, username)
-	code := m.Run()
-	teardown()
-	os.Exit(code)
-}
+// TODO: Implement tests for PUT and DELETE.
+// func TestPut(t *testing.T) {
+// }
 
-func TestApiStatus(t *testing.T) {
-	resp, err := trader.ApiStatus()
-	if err != nil {
-		t.Error(err)
-	}
-	if resp.Status != "spacetraders is currently online and available to play" {
-		t.Error("Unexpected status message")
-	}
-}
-
-// func TestRegisterNewAgent(t *testing.T) {
-// 	err := RegisterNewAgent("alexmccune1224@gmail.com", "COSMIC", "KUSA")
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+// func TestDelete(t *testing.T) {
+//
 // }
