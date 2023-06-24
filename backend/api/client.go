@@ -6,7 +6,42 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/McCune1224/space-jam/types"
 )
+
+// Wrapper struct to encapsulate a generic struct into the data object in the response.
+type ApiDataResponse[ResponseType any] struct {
+	Data ResponseType `json:"data"`
+}
+
+// Wrapper struct to encapsulate a generic struct into the data object in the response.
+type PaginatedApiDataResponse[ResponseType any] struct {
+	Data []ResponseType `json:"data"`
+	Meta types.Meta     `json:"meta"`
+}
+
+// Struct that is used as parameters for requests that use pagination i.e ListContracts.
+type PaginationOptions struct {
+	Limit int
+	Page  int
+}
+
+// Convert struct into kv pair map for query params.
+func (po *PaginationOptions) ToQueryParams() map[string]string {
+	queryParams := make(map[string]string)
+	if po.Limit != 0 {
+		queryParams["limit"] = fmt.Sprintf("%d", po.Limit)
+	}
+	if po.Page != 0 {
+		queryParams["page"] = fmt.Sprintf("%d", po.Page)
+	}
+
+	if len(queryParams) == 0 {
+		return nil
+	}
+	return queryParams
+}
 
 // Helper CRUD http client for the SpaceTraders API.
 type crudClient struct {

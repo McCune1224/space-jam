@@ -9,14 +9,10 @@ import (
 	"github.com/McCune1224/space-jam/types"
 )
 
-// Wrapper struct to encapsulate a generic struct into the data object in the response.
-type ApiDataResponse[ResponseType any] struct {
-	Data ResponseType `json:"data"`
-}
-
 func RegisterNewAgent(email string, faction string, symbol string) error {
 	url := "https://api.spacetraders.io/v2/register"
 
+	// TODO: Make this a struct you can pass in to fill in the values, default if struct with neccessary values is not passed in or missing...
 	payload := strings.NewReader("{\n  \"faction\": \"" + faction + "\",\n  \"symbol\": \"" + symbol + "\",\n  \"email\": \"" + email + "\"\n}")
 
 	req, _ := http.NewRequest("POST", url, payload)
